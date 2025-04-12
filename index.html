@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Administración de Filtros</title>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    label { display: block; margin-top: 10px; }
+    input, textarea { width: 100%; padding: 8px; margin-top: 4px; }
+    button { margin-top: 15px; padding: 10px 20px; cursor: pointer; }
+    img { max-width: 200px; display: block; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Administrar Filtros</h2>
+  <label>ID del Filtro:</label>
+  <input type="text" id="filterId" placeholder="Ej. normal">
+
+  <label>Nombre del Filtro:</label>
+  <input type="text" id="filterName" placeholder="Ej. Normal">
+
+  <label>Filtro CSS (opcional):</label>
+  <input type="text" id="cssFilter" placeholder="Ej. none o sepia(100%)">
+
+  <label>Imagen de Vista Previa (opcional):</label>
+  <input type="file" id="imageInput">
+  <img id="preview" style="display: none;">
+
+  <button onclick="agregarActualizarFiltro()">Agregar/Actualizar Filtro</button>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCFQ_geG0HIv2EZ-bfKc97TJNtf2sdqPzc",
+      authDomain: "clack-koder.firebaseapp.com",
+      databaseURL: "https://clack-koder-default-rtdb.firebaseio.com",
+      projectId: "clack-koder",
+      storageBucket: "clack-koder.firebasestorage.app",
+      messagingSenderId: "478151254938",
+      appId: "1:478151254938:web:e2c00e3a5426bd192b9023",
+      measurementId: "G-P29ME5Z3S1"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    const imageInput = document.getElementById('imageInput');
+    const preview = document.getElementById('preview');
+    let base64Image = "";
+
+    imageInput.addEventListener('change', function () {
+      const file = imageInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = function () {
+          base64Image = reader.result;
+          preview.src = base64Image;
+          preview.style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+      }
+    });
+
+    function agregarActualizarFiltro() {
+      const id = document.getElementById('filterId').value.trim();
+      const nombre = document.getElementById('filterName').value.trim();
+      const css = document.getElementById('cssFilter').value.trim();
+
+      if (!id || !nombre) {
+        alert("Por favor, completa los campos obligatorios (ID y Nombre).");
+        return;
+      }
+
+      const filtro = {
+        nombre,
+        css: css || null,
+        imagen: base64Image || null
+      };
+
+      db.ref("filtros/" + id).set(filtro)
+        .then(() => alert("Filtro agregado o actualizado con éxito."))
+        .catch(err => alert("Error al guardar: " + err));
+    }
+  </script>
+</body>
+</html>

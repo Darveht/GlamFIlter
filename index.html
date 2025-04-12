@@ -15,51 +15,59 @@
       max-width: 400px; margin: 0 auto; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
     }
     label { display: block; margin-top: 10px; }
-    input[type="text"], input[type="file"] { width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px; }
-    button { margin-top: 15px; padding: 10px 15px; border: none; background: #00aaff; color: #fff; border-radius: 4px; cursor: pointer; }
+    input[type="text"], input[type="file"] {
+      width: 100%; padding: 8px; margin-top: 5px; border: 1px solid #ccc; border-radius: 4px;
+    }
+    button {
+      margin-top: 15px; padding: 10px 15px; border: none; background: #00aaff;
+      color: #fff; border-radius: 4px; cursor: pointer;
+    }
     button:hover { background: #0088cc; }
     img { max-width: 200px; display: block; margin-top: 10px; }
-    .message { margin-top: 15px; text-align: center; }\n  </style>
+    .message { margin-top: 15px; text-align: center; }
+  </style>
 </head>
 <body>
   <h1>Administración de Filtros</h1>
-  <form id=\"filterForm\">
-    <label for=\"filterId\">ID del Filtro:</label>
-    <input type=\"text\" id=\"filterId\" placeholder=\"Ej. normal\" required>
+  <form id="filterForm">
+    <label for="filterId">ID del Filtro:</label>
+    <input type="text" id="filterId" placeholder="Ej. normal" required>
     
-    <label for=\"filterName\">Nombre del Filtro:</label>
-    <input type=\"text\" id=\"filterName\" placeholder=\"Ej. Normal\" required>
+    <label for="filterName">Nombre del Filtro:</label>
+    <input type="text" id="filterName" placeholder="Ej. Normal" required>
     
-    <label for=\"cssFilter\">Filtro CSS (opcional):</label>
-    <input type=\"text\" id=\"cssFilter\" placeholder=\"Ej. none o sepia(100%)\">
+    <label for="cssFilter">Filtro CSS (opcional):</label>
+    <input type="text" id="cssFilter" placeholder="Ej. none o sepia(100%)">
     
-    <label for=\"imageInput\">Imagen de Vista Previa (sube desde la galería):</label>
-    <input type=\"file\" id=\"imageInput\">
-    <img id=\"preview\" style=\"display: none;\">
-
-    <button type=\"submit\">Agregar/Actualizar Filtro</button>
-    <div class=\"message\" id=\"message\"></div>
+    <label for="imageInput">Imagen de Vista Previa (sube desde la galería):</label>
+    <!-- Se agrega accept para que solo se puedan seleccionar imágenes -->
+    <input type="file" id="imageInput" accept="image/*">
+    <img id="preview" style="display: none;">
+    
+    <button type="submit">Agregar/Actualizar Filtro</button>
+    <div class="message" id="message"></div>
   </form>
   
   <script>
     // Configuración de Firebase (la misma de la página principal)
     const firebaseConfig = {
-      apiKey: \"AIzaSyCFQ_geG0HIv2EZ-bfKc97TJNtf2sdqPzc\",
-      authDomain: \"clack-koder.firebaseapp.com\",
-      databaseURL: \"https://clack-koder-default-rtdb.firebaseio.com\",
-      projectId: \"clack-koder\",
-      storageBucket: \"clack-koder.firebasestorage.app\",
-      messagingSenderId: \"478151254938\",
-      appId: \"1:478151254938:web:e2c00e3a5426bd192b9023\",
-      measurementId: \"G-P29ME5Z3S1\"
+      apiKey: "AIzaSyCFQ_geG0HIv2EZ-bfKc97TJNtf2sdqPzc",
+      authDomain: "clack-koder.firebaseapp.com",
+      databaseURL: "https://clack-koder-default-rtdb.firebaseio.com",
+      projectId: "clack-koder",
+      storageBucket: "clack-koder.firebasestorage.app",
+      messagingSenderId: "478151254938",
+      appId: "1:478151254938:web:e2c00e3a5426bd192b9023",
+      measurementId: "G-P29ME5Z3S1"
     };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.database();
     
     const imageInput = document.getElementById('imageInput');
     const preview = document.getElementById('preview');
-    let base64Image = \"\";
+    let base64Image = "";
     
+    // Función para convertir la imagen a base64
     imageInput.addEventListener('change', function () {
       const file = imageInput.files[0];
       if (file) {
@@ -68,6 +76,10 @@
           base64Image = reader.result;
           preview.src = base64Image;
           preview.style.display = 'block';
+        };
+        // En caso de error, mostramos un mensaje en consola
+        reader.onerror = function (error) {
+          console.error("Error al leer el archivo:", error);
         };
         reader.readAsDataURL(file);
       }
@@ -78,6 +90,7 @@
     
     filterForm.addEventListener('submit', (e) => {
       e.preventDefault();
+      
       const filterId = document.getElementById('filterId').value.trim();
       const filterName = document.getElementById('filterName').value.trim();
       const cssFilter = document.getElementById('cssFilter').value.trim();
@@ -100,7 +113,7 @@
           messageDiv.style.color = 'green';
           filterForm.reset();
           preview.style.display = 'none';
-          base64Image = \"\";
+          base64Image = "";
         })
         .catch(err => {
           messageDiv.textContent = 'Error: ' + err;
